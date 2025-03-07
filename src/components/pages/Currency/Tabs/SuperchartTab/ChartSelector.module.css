@@ -1,0 +1,21 @@
+.chartSelector {
+    width: 19rem;
+    background-color: #181818;
+    border-radius: 12px;
+    display: flex;
+    gap: 0px;
+    justify-content: start;
+    /* align-items: center; */
+    flex-direction: column;
+    margin-right: 3.5rem;
+}
+
+.chart {
+    padding: 0 0.3rem;
+    display: flex;
+    align-items: center;
+}
+
+.chartName {
+    color: white;
+}

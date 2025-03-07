@@ -1,0 +1,60 @@
+.chartCard {
+  background-color: #1f1f1f;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.chartHeader {
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.chartTitle {
+  color: #fff;
+  text-transform: uppercase;
+  font-family: Inter, sans-serif;
+  font-size: 28px;
+}
+
+.chartDate {
+  color: #fff;
+  gap: 7px;
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+}
+
+.chartControls {
+  color: #fff;
+  gap: 37px;
+  margin-top: 11px;
+  font-family: Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+}
+
+.controlGroup {
+  align-items: center;
+  gap: 6px;
+  display: flex;
+}
+
+.divider {
+  background-color: #ffffff61;
+  width: 1px;
+  height: 25px;
+}
+
+@media (width <= 640px) {
+  .chartHeader {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .chartControls {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
