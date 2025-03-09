@@ -17,7 +17,7 @@ const CurrencyView: React.FC = () => {
   const tabs = [
     { name: "Dashboard", id: "dashboard", element: <DashboardTab />, }, 
     { name: "Market Participants", id: "market-participants", element: <MarketParticipantsTab/>, }, 
-    { name: "Superchart", id: "superchart", element: <SuperchartTab/>, }, 
+    { name: "Superchart", id: "superchart", element: <SuperchartTab fullscreen={false}/>, }, 
     // { name: "Entry Analysis", id: "entry-analysis", element: <EntryAnalysisTab/>, }, 
     { name: "Influencers", id: "influencers", element: <InfluencersTab/>, }, 
     { name: "High-Value Traders", id: "high-value-traders", element: <HighValueTradersTab/>, }, 

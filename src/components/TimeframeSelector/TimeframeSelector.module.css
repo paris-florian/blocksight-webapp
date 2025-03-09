@@ -1,0 +1,34 @@
+.container {
+    display: flex;
+    align-items: center;
+    /* background-color: #000; */
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+  }
+  
+.timeframeButton {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #a0a0a0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.1s ease;
+}
+
+.timeframeButton:hover {
+color: #d0d0d0;
+}
+
+.selected {
+    color: white;
+}
+
+.divider {
+    height: 24px;
+    width: 1px;
+    background-color: #555;
+    margin: 0 4px;
+}

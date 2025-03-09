@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Sidebar.module.css';
 import { DatasetSidebarElement, SidebarElement } from '../pages/Currency/Tabs/SuperchartTab/SuperchartTab';
-import { Checkbox } from '@mui/material';
+import { Checkbox, IconButton } from '@mui/material';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 interface MenuItem {
   type: 'toggle' | 'dropdown';
@@ -13,75 +14,41 @@ interface MenuItem {
   items?: string[];
 }
 
-// const menuItems: MenuItem[] = [
-//   {
-//     type: 'dropdown',
-//     icon: (
-//       <svg className='white-svg' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
-//         <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H447l-80-80H160v480Zm0 0v-480 480Zm400-160v40q0 17 11.5 28.5T600-320q17 0 28.5-11.5T640-360v-40h40q17 0 28.5-11.5T720-440q0-17-11.5-28.5T680-480h-40v-40q0-17-11.5-28.5T600-560q-17 0-28.5 11.5T560-520v40h-40q-17 0-28.5 11.5T480-440q0 17 11.5 28.5T520-400h40Z"/>
-//       </svg>
-//     ),
-//     text: 'Create',
-//     items: ['Folder', 'Document', 'Project']
-//   },
-//   {
-//     type: 'dropdown',
-//     icon: (
-//       <svg className='white-svg' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
-//         <path d="m221-313 142-142q12-12 28-11.5t28 12.5q11 12 11 28t-11 28L250-228q-12 12-28 12t-28-12l-86-86q-11-11-11-28t11-28q11-11 28-11t28 11l57 57Zm0-320 142-142q12-12 28-11.5t28 12.5q11 12 11 28t-11 28L250-548q-12 12-28 12t-28-12l-86-86q-11-11-11-28t11-28q11-11 28-11t28 11l57 57Zm339 353q-17 0-28.5-11.5T520-320q0-17 11.5-28.5T560-360h280q17 0 28.5 11.5T880-320q0 17-11.5 28.5T840-280H560Zm0-320q-17 0-28.5-11.5T520-640q0-17 11.5-28.5T560-680h280q17 0 28.5 11.5T880-640q0 17-11.5 28.5T840-600H560Z"/>
-//       </svg>
-//     ),
-//     text: 'Todo-Lists',
-//     items: ['Work', 'Private', 'Coding', 'Gardening', 'School']
-//   },
-//   {
-//     type: 'dropdown',
-//     icon: (
-//       <svg className='white-svg' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
-//         <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H447l-80-80H160v480Zm0 0v-480 480Zm400-160v40q0 17 11.5 28.5T600-320q17 0 28.5-11.5T640-360v-40h40q17 0 28.5-11.5T720-440q0-17-11.5-28.5T680-480h-40v-40q0-17-11.5-28.5T600-560q-17 0-28.5 11.5T560-520v40h-40q-17 0-28.5 11.5T480-440q0 17 11.5 28.5T520-400h40Z"/>
-//       </svg>
-//     ),
-//     text: 'Create',
-//     items: ['Folder', 'Document', 'Project']
-//   },
-//   {
-//     type: 'dropdown',
-//     icon: (
-//       <svg className='white-svg' xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
-//         <path d="m221-313 142-142q12-12 28-11.5t28 12.5q11 12 11 28t-11 28L250-228q-12 12-28 12t-28-12l-86-86q-11-11-11-28t11-28q11-11 28-11t28 11l57 57Zm0-320 142-142q12-12 28-11.5t28 12.5q11 12 11 28t-11 28L250-548q-12 12-28 12t-28-12l-86-86q-11-11-11-28t11-28q11-11 28-11t28 11l57 57Zm339 353q-17 0-28.5-11.5T520-320q0-17 11.5-28.5T560-360h280q17 0 28.5 11.5T880-320q0 17-11.5 28.5T840-280H560Zm0-320q-17 0-28.5-11.5T520-640q0-17 11.5-28.5T560-680h280q17 0 28.5 11.5T880-640q0 17-11.5 28.5T840-600H560Z"/>
-//       </svg>
-//     ),
-//     text: 'Todo-Lists',
-//     items: ['Work', 'Private', 'Coding', 'Gardening', 'School']
-//   },
-// ];
-
 interface SidebarProps {
     sidebarElements: SidebarElement[];
     defaultSelected: DatasetSidebarElement[];
+    fullscreen: boolean;
     setSelected: (selected: DatasetSidebarElement[]) => void;
+    openSettings: (element: DatasetSidebarElement) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = (props) => {
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
     
-    const [selected, setSelectedState] = useState(
-        props.sidebarElements.flatMap(e => e.type === 'DatasetSidebarElement' ? [e] : e.elements).map((c) => ({
-            chart: c,
-            selected: props.defaultSelected.some((s) => s.id === c.id),
-        }))
-    );
+    const allDatasetElements = new Map<string, DatasetSidebarElement>();
+    props.sidebarElements.forEach(element => {
+        if (element.type === 'DatasetSidebarElement') {
+            allDatasetElements.set(element.id, element);
+        } else {
+            element.elements.forEach(el => allDatasetElements.set(el.id, el));
+        }
+    });
+
+    const [selected, setSelectedState] = useState<Map<string, boolean>>(() => {
+        const initial = new Map<string, boolean>();
+        allDatasetElements.forEach((element, id) => {
+            initial.set(id, props.defaultSelected.some(s => s.id === id));
+        });
+        return initial;
+    });
 
     const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
 
-    const handleCheckboxChange = (checked: boolean, index: number) => {
-        setSelectedState((prevSelected) => {
-            const updatedSelected = [...prevSelected];
-            updatedSelected[index] = {
-                ...updatedSelected[index],
-                selected: checked,
-            };
-            return updatedSelected;
+    const handleCheckboxChange = (elementId: string, checked: boolean) => {
+        setSelectedState(prev => {
+            const newState = new Map(prev);
+            newState.set(elementId, checked);
+            return newState;
         });
     };
 
@@ -97,16 +64,27 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
         });
     };
 
-    const renderElement = (element: DatasetSidebarElement, index: number) => {
+    const renderElement = (element: DatasetSidebarElement) => {
         return (
-            <div key={element.id} className={styles.element}>
+            <div 
+                key={element.id} 
+                className={styles.element}
+                onClick={() => handleCheckboxChange(element.id, !selected.get(element.id))}
+            >
+              <div className={styles.checkboxContainer}>
                 <Checkbox
-                    checked={selected[index]?.selected}
-                    onChange={(e) => handleCheckboxChange(e.target.checked, index)}
+                    sx={{pr: 0, pl: 0}}
+                    checked={selected.get(element.id) || false}
+                    onChange={(e) => e.stopPropagation()} // Prevent checkbox from handling click
                     className={styles.checkbox}
                     {...label}
                 />
                 <div className={styles.elementName}>{element.name}</div>
+              </div>
+              {(element.settings.length > 0 &&
+              <IconButton onClick={e => { e.stopPropagation(); props.openSettings(element);}} className={styles.settingsButton} aria-label="edit">
+                <SettingsIcon sx={{fill: "#D3D3D3"}}/>
+              </IconButton>)}
             </div>
         );
     };
@@ -115,12 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
         if (folder.type !== 'FolderSidebarElement') return null;
 
         const isOpen = openFolders.has(folder.id);
-        const folderElements = folder.elements.map((element, index) => {
-            const globalIndex = props.sidebarElements
-                .filter(e => e.type === 'DatasetSidebarElement')
-                .findIndex(e => e.id === element.id);
-            return renderElement(element, globalIndex);
-        });
+        const folderElements = folder.elements.map(element => renderElement(element));
 
         return (
             <div key={folder.id} className={styles.folder}>
@@ -129,37 +102,51 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
                     onClick={() => toggleFolder(folder.id)}
                 >
                     <KeyboardArrowRightIcon 
-                        className={`${styles.folderIcon} ${isOpen ? styles.open : ''}`}
+                       sx={{fill: "white"}} className={`${styles.folderIcon} ${isOpen ? styles.open : ''}`}
                     />
                     <div className={styles.elementName}>{folder.name}</div>
                 </div>
-                {isOpen && (
-                    <div className={styles.folderContent}>
-                        {folderElements}
-                    </div>
-                )}
+                <div className={`${styles.folderContent} ${isOpen ? styles.open : ''}`}>
+                    {folderElements}
+                </div>
             </div>
         );
     };
 
     const renderContent = () => {
-        return props.sidebarElements.map((element, index) => {
+        return props.sidebarElements.map((element) => {
             if (element.type === 'FolderSidebarElement') {
                 return renderFolder(element);
             } else {
-                return renderElement(element, index);
+                return renderElement(element);
             }
         });
     };
 
-    React.useEffect(() => {
-        props.setSelected(
-            selected.filter((item) => item.selected).map((item) => item.chart)
-        );
+    useEffect(() => {
+        // Convert selected state to array of selected elements
+        const selectedElements = Array.from(selected.entries())
+            .filter(([_, isSelected]) => isSelected)
+            .map(([id]) => allDatasetElements.get(id)!);
+
+        props.setSelected(selectedElements);
     }, [selected]);
 
     return (
         <div className={styles.sidebar}>
+            {props.fullscreen && (
+                <div className={styles.tokenHeader}>
+                    <img
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/80c395bd9a848e3be7b94f639b10e2a192a869b763d5a61942632d889ffe7c11?placeholderIfAbsent=true"
+                        alt="Token icon"
+                        className={styles.tokenIcon}
+                    />
+                    <div className={styles.tokenInfo}>
+                        <h2 className={styles.tokenName}>$TRUMP</h2>
+                        <p className={styles.tokenPrice}>$13.244</p>
+                    </div>
+                </div>
+            )}
             {renderContent()}
         </div>
     );

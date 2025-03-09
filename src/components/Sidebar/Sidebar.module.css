@@ -29,24 +29,40 @@ body {
 } */
 
 .sidebar {
-  width: 19rem;
+  overflow-y: auto;
+  max-height: 100%;
+  min-width: 15rem;
   background-color: #181818;
-  border-radius: 12px;
+  /* border-radius: 12px; */
+  /* border-top-left-radius: 12px; */
+  /* border-bottom-left-radius: 12px; */
   display: flex;
-  gap: 0px;
+  gap: 0.2rem;
   justify-content: start;
   flex-direction: column;
-  margin-right: 3.5rem;
   padding: 1rem;
 }
 
+.settingsButton {
+  margin-left: 1rem;
+}
+.settingsButton svg {
+  /* fill: red */
+}
+.checkboxContainer {
+  display: flex;;
+  align-items: center;
+}
+
 .element {
-  padding: 0.5rem 0.3rem;
+  height: 2.5rem;
+  padding: 0 0.5rem;
   display: flex;
   align-items: center;
   color: white;
   cursor: pointer;
   border-radius: 4px;
+  justify-content: space-between;
   transition: background-color 0.2s;
 }
 
@@ -58,6 +74,7 @@ body {
   color: white;
   margin-left: 0.5rem;
   flex-grow: 1;
+  font-size: 0.875rem;
 }
 
 .folder {
@@ -67,9 +84,10 @@ body {
 }
 
 .folderHeader {
+  height: 2.5rem;
+  padding: 0 0.5rem;
   display: flex;
   align-items: center;
-  padding: 0.5rem 0.3rem;
   cursor: pointer;
   border-radius: 4px;
   transition: background-color 0.2s;
@@ -80,26 +98,31 @@ body {
 }
 
 .folderContent {
-  margin-left: 1.5rem;
+  margin-left: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.folderContent.open {
+  max-height: 500px; /* Adjust this value based on your content */
 }
 
 .folderIcon {
-  transition: transform 0.2s;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.folderIcon svg {
+  fill: white !important;
 }
 
 .folderIcon.open {
   transform: rotate(90deg);
-}
-
-.checkbox {
-  color: white !important;
-}
-
-.checkbox.Mui-checked {
-  color: #5e63ff !important;
 }
 
 .sidebar.close {
@@ -152,7 +175,7 @@ body {
 
 .sidebar svg {
   flex-shrink: 0;
-  fill: var(--text-clr);
+  /* fill: var(--text-clr); */
 }
 
 .sidebar a span,
@@ -281,3 +304,37 @@ body {
     justify-content: center;
   }
 } 
+
+.tokenHeader {
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 50px;
+  display: flex;
+}
+
+.tokenIcon {
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+}
+
+.tokenInfo {
+  flex-direction: column;
+  gap: 2px;
+  display: flex;
+}
+
+.tokenName {
+  color: #fff;
+  font-family: IBM Plex Mono, monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.tokenPrice {
+  color: #fff;
+  font-family: IBM Plex Mono, monospace;
+  font-size: 1.2rem;
+  margin: 0;
+}
