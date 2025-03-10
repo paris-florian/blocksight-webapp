@@ -338,3 +338,54 @@ body {
   font-size: 1.2rem;
   margin: 0;
 }
+
+.searchContainer {
+    /* padding: 0.5rem 1rem; */
+    margin-bottom: 0.5rem;
+}
+
+.searchInput {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: white !important;
+}
+
+.searchInput input {
+    color: white !important;
+}
+
+.searchInput input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1;
+}
+
+.searchInput fieldset {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.searchInput:hover fieldset {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.backButton {
+  margin-top: 0.3rem !important;
+  width: 2.5rem;
+  margin-bottom: 1rem !important;
+}
+
+.tokenIconContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.swapButton {
+  position: absolute !important;
+  top: -8px !important;
+  right: -8px !important;
+  background-color: #000000 !important;
+  padding: 4px !important;
+}
+
+.swapButton:hover {
+  background-color: #1a1a1a !important;
+}

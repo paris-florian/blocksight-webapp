@@ -11,7 +11,7 @@ const MagnetToggle = (props: { default: boolean, setMagnetState: (toggledOn: boo
   };
 
   return (
-    <div className={styles.container}>
+    // <div className={styles.container}>
         <React.Fragment key={"magnet"}>
         <div className={styles.divider}></div>
           <button
@@ -25,7 +25,7 @@ const MagnetToggle = (props: { default: boolean, setMagnetState: (toggledOn: boo
           <div className={styles.divider}></div>
           {/* )} */}
         </React.Fragment>
-    </div>
+    // </div>
   );
 };
 

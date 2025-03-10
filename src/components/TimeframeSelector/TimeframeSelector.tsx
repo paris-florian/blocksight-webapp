@@ -17,12 +17,8 @@ const TimeframeSelector = (props: { defaultTimeframe: Timeframe, availableTimefr
     setSelectedTimeframe(TimeframeId);
   };
 
-  useEffect(() => {
-
-  }, [selectedTimeframe]);
-  
   return (
-    <div className={styles.container}>
+    <>
       {props.availableTimeframes.map((timeframe, index) => (
         <React.Fragment key={timeframe}>
           <button
@@ -36,7 +32,7 @@ const TimeframeSelector = (props: { defaultTimeframe: Timeframe, availableTimefr
           )}
         </React.Fragment>
       ))}
-    </div>
+    </>
   );
 };
 

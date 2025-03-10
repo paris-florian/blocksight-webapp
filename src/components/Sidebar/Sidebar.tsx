@@ -1,9 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Sidebar.module.css';
 import { DatasetSidebarElement, SidebarElement } from '../pages/Currency/Tabs/SuperchartTab/SuperchartTab';
-import { Checkbox, IconButton } from '@mui/material';
+import { Checkbox, IconButton, TextField } from '@mui/material';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import SettingsIcon from '@mui/icons-material/Settings';
+import SearchIcon from '@mui/icons-material/Search';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate, useParams } from 'react-router';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import TokenSearchPopup from '../TokenSearchPopup/TokenSearchPopup';
+import { priceService } from '../../services/PriceService';
+
+export interface Token {
+    symbol: string;
+    name: string;
+    iconUrl: string;
+    price?: string;
+}
+
+// Add this mock data (you can replace it with your actual token list)
+export const mockTokens: Token[] = [
+    { symbol: 'TRUMP', name: 'Trump Token', iconUrl: '/assets/trump-token.png' },
+    { symbol: 'BTC', name: 'Bitcoin', iconUrl: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png' },
+    { symbol: 'ETH', name: 'Ethereum', iconUrl: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png' },
+    // Add more tokens as needed
+];
 
 interface MenuItem {
   type: 'toggle' | 'dropdown';
@@ -20,10 +41,14 @@ interface SidebarProps {
     fullscreen: boolean;
     setSelected: (selected: DatasetSidebarElement[]) => void;
     openSettings: (element: DatasetSidebarElement) => void;
+    initialToken?: Token;
 }
 
 export const Sidebar: React.FC<SidebarProps> = (props) => {
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
+    const [searchQuery, setSearchQuery] = useState('');
+    
+    let navigate = useNavigate();
     
     const allDatasetElements = new Map<string, DatasetSidebarElement>();
     props.sidebarElements.forEach(element => {
@@ -43,6 +68,20 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
     });
 
     const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [selectedToken, setSelectedToken] = useState<Token>(props.initialToken || mockTokens[0]);
+    const [currentPrice, setCurrentPrice] = useState<string>(
+        priceService.formatPrice(priceService.getPrice(selectedToken.symbol))
+    );
+
+    // Subscribe to price updates for the selected token
+    useEffect(() => {
+        const unsubscribe = priceService.subscribeToPriceUpdates(
+            selectedToken.symbol,
+            (price) => setCurrentPrice(priceService.formatPrice(price))
+        );
+        return () => unsubscribe();
+    }, [selectedToken.symbol]);
 
     const handleCheckboxChange = (elementId: string, checked: boolean) => {
         setSelectedState(prev => {
@@ -113,8 +152,26 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
         );
     };
 
-    const renderContent = () => {
-        return props.sidebarElements.map((element) => {
+    const filterElements = (elements: SidebarElement[]) => {
+        return elements.map(element => {
+            if (element.type === 'FolderSidebarElement') {
+                const filteredElements = element.elements.filter(el =>
+                    el.name.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+                // Only return folder if it has matching elements
+                return filteredElements.length > 0 ? {
+                    ...element,
+                    elements: filteredElements
+                } : null;
+            } else if (element.type === 'DatasetSidebarElement') {
+                return element.name.toLowerCase().includes(searchQuery.toLowerCase()) ? element : null;
+            }
+            return null;
+        }).filter(Boolean) as SidebarElement[];
+    };
+
+    const renderContent = (elements: SidebarElement[]) => {
+        return elements.map((element) => {
             if (element.type === 'FolderSidebarElement') {
                 return renderFolder(element);
             } else {
@@ -132,22 +189,68 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
         props.setSelected(selectedElements);
     }, [selected]);
 
+    const { currencyId } = useParams()
+    
+    const handleTokenSelect = (token: Token) => {
+        setSelectedToken(token);
+        setCurrentPrice(priceService.formatPrice(priceService.getPrice(token.symbol)));
+        // Update URL based on current view
+        if (props.fullscreen) {
+            navigate(`/superchart/${token.symbol.toLowerCase()}`);
+        } else {
+            navigate(`/currencies/${token.symbol.toLowerCase()}#superchart`);
+        }
+    };
+
     return (
         <div className={styles.sidebar}>
             {props.fullscreen && (
-                <div className={styles.tokenHeader}>
-                    <img
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/80c395bd9a848e3be7b94f639b10e2a192a869b763d5a61942632d889ffe7c11?placeholderIfAbsent=true"
-                        alt="Token icon"
-                        className={styles.tokenIcon}
-                    />
-                    <div className={styles.tokenInfo}>
-                        <h2 className={styles.tokenName}>$TRUMP</h2>
-                        <p className={styles.tokenPrice}>$13.244</p>
+                <>
+                    <IconButton 
+                        onClick={e => { 
+                            e.stopPropagation(); 
+                            navigate(`/currencies/${currencyId}#superchart`);
+                        }} 
+                        className={styles.backButton} 
+                        aria-label="back to dashboard"
+                    >
+                        <ArrowBackIcon sx={{fill: "#D3D3D3"}} />
+                    </IconButton>
+                    <div className={styles.tokenHeader}>
+                        <div>
+                            <div className={styles.tokenIconContainer}>
+                                <img
+                                    src={selectedToken.iconUrl}
+                                    alt={`${selectedToken.symbol} icon`}
+                                    className={styles.tokenIcon}
+                                />
+                                <IconButton 
+                                    className={styles.swapButton}
+                                    size="small"
+                                    aria-label="swap token"
+                                    onClick={() => setSearchOpen(true)}
+                                >
+                                    <SwapHorizIcon fontSize="small" sx={{fill: "white"}} />
+                                </IconButton>
+                            </div>
+                        </div>
+                        <div className={styles.tokenInfo}>
+                            <h2 className={styles.tokenName}>${selectedToken.symbol}</h2>
+                            <p className={styles.tokenPrice}>{currentPrice}</p>
+                        </div>
                     </div>
-                </div>
+                    <TokenSearchPopup
+                        open={searchOpen}
+                        onClose={() => setSearchOpen(false)}
+                        onTokenSelect={handleTokenSelect}
+                        tokens={mockTokens.map(token => ({
+                            ...token,
+                            price: priceService.formatPrice(priceService.getPrice(token.symbol))
+                        }))}
+                    />
+                </>
             )}
-            {renderContent()}
+            {renderContent(filterElements(props.sidebarElements))}
         </div>
     );
 };

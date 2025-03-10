@@ -202,7 +202,7 @@ export class TooltipPrimitive implements ISeriesPrimitive<Time> {
 		}
 		chart.applyOptions({
 			crosshair: {
-				mode: CrosshairMode.Magnet,
+				mode: CrosshairMode.Normal,
 				vertLine: {
 					visible: false,
 					labelVisible: false,

@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import styles from './SuperchartTab.module.css';
 import Sidebar from "../../../../Sidebar/Sidebar";
-import Chart, { SeriesType } from "../../../../Chart/Chart";
+import { mockTokens } from "../../../../Sidebar/Sidebar";
+import Chart, { ChartHandle, SeriesType } from "../../../../Chart/Chart";
 import TimeframeSelector, { Timeframe } from "../../../../TimeframeSelector/TimeframeSelector";
 import { DatasetSettings } from "./DatasetSettings";
 import ChartTopSelector from "../../../../ChartTopSettings/ChartTopSelector";
 import MagnetToggle from "../../../../MagnetToggle/MagnetToggle";
 import { CrosshairMode, IChartApi } from "lightweight-charts";
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import { Fullscreen } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+import { useNavigate, useParams } from "react-router";
+import { e } from "react-router/dist/development/route-data-BmvbmBej";
 
 export type SidebarElement = FolderSidebarElement | DatasetSidebarElement;
 
@@ -194,14 +200,20 @@ const elements: SidebarElement[] = [
 export const SuperchartTab = (props: {fullscreen: boolean}) => {
     const [selected, setSelected] = useState<DatasetSidebarElement[]>(() => {
         const selected: DatasetSidebarElement[] = [];
+        const bf = localStorage.getItem("selected-datasets");
+        const bd: string[] = bf ? JSON.parse(bf) : null;
         elements.forEach(element => {
+            const push = (element: DatasetSidebarElement) => {
+                console.error(bd)
+                return bd ? (bd.findIndex(b => b === element.id) > -1 ? true : false) : element.defaultSelected;
+            }
             if (element.type === "DatasetSidebarElement") {
-                if (element.defaultSelected) {
+                if (push(element)) {
                     selected.push(element);
                 }
             } else {
                 element.elements.forEach(el => {
-                    if (el.defaultSelected) {
+                    if (push(el)) {
                         selected.push(el);
                     }
                 });
@@ -213,9 +225,10 @@ export const SuperchartTab = (props: {fullscreen: boolean}) => {
     const defaultTimeframe = Timeframe["15m"];
     const [selectedTimeframe, setSelectedTimeframe] = useState(defaultTimeframe);
     const [settings, setSettings] = useState<DatasetSidebarElement | undefined>(undefined);
-    // const [magnetOn, setMagnetOn] = useState<boolean>(true);
+    const [magnetOn, setMagnetOn] = useState<boolean>(true);
 
     const handleSelectedChange = (newSelected: DatasetSidebarElement[]) => {
+        localStorage.setItem("selected-datasets", JSON.stringify(newSelected.map(s => s.id)));
         setSelected(newSelected);
     };
 
@@ -223,35 +236,51 @@ export const SuperchartTab = (props: {fullscreen: boolean}) => {
         setSettings(undefined);
     };
 
-    const [chart, setChart] = useState<IChartApi | undefined>(undefined);
+    const { currencyId } = useParams();
+    const chartRef = useRef<ChartHandle>(null);
+    let navigate = useNavigate();
+
+    // Find the current token from the URL parameter
+    const currentToken = mockTokens.find(
+        token => token.symbol.toLowerCase() === currencyId?.toLowerCase()
+    ) || mockTokens[0];
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} style={props.fullscreen ? {} : {borderRadius: "12px", overflow: "hidden"}}>
             <Sidebar
                 sidebarElements={elements}
                 defaultSelected={selected}
                 setSelected={handleSelectedChange}
                 openSettings={element => setSettings(element)}
                 fullscreen={props.fullscreen}
+                initialToken={currentToken}
             />
             <div className={styles.chartContainer}>
-                <ChartTopSelector>
-                    <TimeframeSelector 
-                        setSelectedTimeframe={s => setSelectedTimeframe(s)} 
-                        defaultTimeframe={selectedTimeframe} 
-                        availableTimeframes={[
-                            Timeframe["15m"], 
-                            Timeframe["1h"], 
-                            Timeframe["4h"], 
-                            Timeframe["1d"], 
-                            Timeframe["1w"], 
-                            Timeframe["1M"]
-                        ]} 
-                    />
-                    <MagnetToggle setMagnetState={t => { console.error(t); console.error(chart); chart?.applyOptions({crosshair: { mode: t ? CrosshairMode.Magnet : CrosshairMode.Normal}}) }} default={true} />
-                </ChartTopSelector>
-                <Chart
-                    onChart={c => setChart(c)}
+                <div>
+                    <ChartTopSelector>
+                        <TimeframeSelector 
+                            setSelectedTimeframe={s => setSelectedTimeframe(s)} 
+                            defaultTimeframe={selectedTimeframe} 
+                            availableTimeframes={[
+                                Timeframe["15m"], 
+                                Timeframe["1h"], 
+                                Timeframe["4h"], 
+                                Timeframe["1d"], 
+                                Timeframe["1w"], 
+                                Timeframe["1M"]
+                            ]} 
+                        />
+                        {!props.fullscreen && (
+                            
+                <IconButton onClick={e => { e.stopPropagation(); navigate("/superchart/"+currencyId) }} className={styles.settingsButton} aria-label="edit">
+                    <FullscreenIcon  sx={{fill: "#D3D3D3"}} />
+                </IconButton>)}
+                        {/* <MagnetToggle setMagnetState={t => { chartRef.current?.applyOptions({crosshair: { mode: t ? CrosshairMode.Magnet : CrosshairMode.Normal}}) }} default={true} /> */}
+                    </ChartTopSelector>
+                </div>
+                <Chart 
+                    ref={chartRef}
+                    // onChart={c => setChart(c)}
                     panes={selected.map(element => ({
                         name: element.name,
                         series: element.series

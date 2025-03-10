@@ -18,7 +18,9 @@ import {
   LineSeries,
   HistogramData,
   createTextWatermark,
-  IChartApi
+  IChartApi,
+  ChartOptions,
+  CrosshairMode
 } from 'lightweight-charts';
 import { multipleBarData } from './sample-data';
 import { StackedAreaSeries } from './stacked-area-series';
@@ -63,108 +65,108 @@ interface ChartProps {
   points?: number;
   shuffle?: number;
   panes: IPane[];
-  onChart: (chart: IChartApi) => void;
+  // onChart: (chart: IChartApi) => void;
 }
 
 export interface ChartHandle {
-  applyOptions: (options: DeepPartial<any>) => void;
+  applyOptions: (options: DeepPartial<ChartOptions>) => void;
   chart: () => IChartApi | null;
 }
 
 /* eslint-disable max-classes-per-file */
-class AxisView implements ISeriesPrimitiveAxisView {
-  _color: any;
-  _text: string;
-  _position: number;
+// class AxisView implements ISeriesPrimitiveAxisView {
+//   _color: any;
+//   _text: string;
+//   _position: number;
   
-  constructor(text: string, color: any, position: number) {
-    this._color = color;
-    this._text = text;
-    this._position = position;
-  }
+//   constructor(text: string, color: any, position: number) {
+//     this._color = color;
+//     this._text = text;
+//     this._position = position;
+//   }
   
-  coordinate() {
-    return this._position;
-  }
+//   coordinate() {
+//     return this._position;
+//   }
   
-  text() {
-    return this._text;
-  }
+//   text() {
+//     return this._text;
+//   }
   
-  textColor() {
-    return '#FFFFFF';
-  }
+//   textColor() {
+//     return '#FFFFFF';
+//   }
   
-  backColor() {
-    return this._color;
-  }
-}
+//   backColor() {
+//     return this._color;
+//   }
+// }
 
-class LegendPaneRenderer {
-  _sections: unknown[];
+// class LegendPaneRenderer {
+//   _sections: unknown[];
   
-  constructor(sections: { [s: string]: unknown; } | ArrayLike<unknown>) {
-    this._sections = Object.values(sections);
-  }
+//   constructor(sections: { [s: string]: unknown; } | ArrayLike<unknown>) {
+//     this._sections = Object.values(sections);
+//   }
   
-  draw(target: { useMediaCoordinateSpace: (arg0: (scope: any) => void) => void; }) {
-    const count = this._sections.length;
-    const longestText = this._sections.reduce((longest: any, section: any) => {
-      if (section.name.length > longest.length) {
-        return section.name;
-      }
-      return longest;
-    }, '');
+//   draw(target: { useMediaCoordinateSpace: (arg0: (scope: any) => void) => void; }) {
+//     const count = this._sections.length;
+//     const longestText = this._sections.reduce((longest: any, section: any) => {
+//       if (section.name.length > longest.length) {
+//         return section.name;
+//       }
+//       return longest;
+//     }, '');
     
-    target.useMediaCoordinateSpace((scope: { context: any; }) => {
-      const ctx  = scope.context;
-      ctx.font = "bold 10pt Courier";
-      const longestTextMeasurements = ctx.measureText(longestText);
-      ctx.beginPath();
-      ctx.roundRect(
-        20,
-        20,
-        longestTextMeasurements.width + 30,
-        (count + 0) * 20 + 10,
-        8
-      );
-      ctx.globalAlpha = 0.95;
-      ctx.fillStyle = '#FFFFFF';
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      let currentY = 30;
-      this._sections.forEach((section: any) => {
-        ctx.beginPath();
-        // ctx.roundRect(30, currentY, 10, 10, 3);
-        ctx.fillStyle = section.color;
-        ctx.fill();
-        ctx.fillStyle = '#000000';
-        ctx.textBaseline = 'bottom';
+//     target.useMediaCoordinateSpace((scope: { context: any; }) => {
+//       const ctx  = scope.context;
+//       ctx.font = "bold 10pt Courier";
+//       const longestTextMeasurements = ctx.measureText(longestText);
+//       ctx.beginPath();
+//       ctx.roundRect(
+//         20,
+//         20,
+//         longestTextMeasurements.width + 30,
+//         (count + 0) * 20 + 10,
+//         8
+//       );
+//       ctx.globalAlpha = 0.95;
+//       ctx.fillStyle = '#FFFFFF';
+//       ctx.fill();
+//       ctx.globalAlpha = 1;
+//       let currentY = 30;
+//       this._sections.forEach((section: any) => {
+//         ctx.beginPath();
+//         // ctx.roundRect(30, currentY, 10, 10, 3);
+//         ctx.fillStyle = section.color;
+//         ctx.fill();
+//         ctx.fillStyle = '#000000';
+//         ctx.textBaseline = 'bottom';
 
-        ctx.fillText(section.name, 36, currentY + 12);
+//         ctx.fillText(section.name, 36, currentY + 12);
 
         
-        currentY += 20;
-      });
-    });
-  }
-}
+//         currentY += 20;
+//       });
+//     });
+//   }
+// }
 
-class LegendView implements IPrimitivePaneView {
-  _renderer: LegendPaneRenderer;
+// class LegendView implements IPrimitivePaneView {
+//   _renderer: LegendPaneRenderer;
   
-  constructor(sections: any) {
-    this._renderer = new LegendPaneRenderer(sections);
-  }
+//   constructor(sections: any) {
+//     this._renderer = new LegendPaneRenderer(sections);
+//   }
   
-  zOrder(): PrimitivePaneViewZOrder {
-    return 'top' as PrimitivePaneViewZOrder;
-  }
+//   zOrder(): PrimitivePaneViewZOrder {
+//     return 'top' as PrimitivePaneViewZOrder;
+//   }
   
-  renderer() {
-    return this._renderer;
-  }
-}
+//   renderer() {
+//     return this._renderer;
+//   }
+// }
 
 class PaneRenderer {
   _color: any;
@@ -232,7 +234,7 @@ class SectionsPrimitive implements ISeriesPrimitive<Time> {
     
     this._paneViews = [
       new PaneView(this.sections.pane.color),
-      new LegendView(this.sections),
+      // new LegendView(this.sections),
     ];
     
     // this._pricePaneViews = [new PaneView(this.sections.price.color)];
@@ -275,13 +277,13 @@ const Chart = forwardRef<ChartHandle, ChartProps>(({
   points = 200,
   shuffle = 2,
   panes,
-  onChart
+  // onChart
 }: ChartProps, ref) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartInstanceRef = useRef<IChartApi | null>(null);
   
   useImperativeHandle(ref, () => ({
-    applyOptions: (options: DeepPartial<any>) => {
+    applyOptions: (options: DeepPartial<ChartOptions>) => {
       if (chartInstanceRef.current) {
         chartInstanceRef.current.applyOptions(options);
       }
@@ -309,19 +311,11 @@ const Chart = forwardRef<ChartHandle, ChartProps>(({
       autoSize: true,
       rightPriceScale: {
         scaleMargins: {
-          top: 0.05,
-          bottom: 0.05,
+          top: 0,
+          bottom: 0,  
         }
       }
     });
-
-    // Store chart instance in ref
-    chartInstanceRef.current = chart;
-    
-    // Call onChart callback if provided
-    if (onChart) {
-      onChart(chart);
-    }
     
     for (var index = 0; index < panes.length; index++) {
       const pane = panes[index];
@@ -339,7 +333,7 @@ const Chart = forwardRef<ChartHandle, ChartProps>(({
 
             volumeSeries.priceScale().applyOptions({
                 scaleMargins: {
-                    top: 0.2, 
+                    top: 0.15, 
                     bottom: 0,
                 },
             });
@@ -355,22 +349,28 @@ const Chart = forwardRef<ChartHandle, ChartProps>(({
             candlestickSeries.attachPrimitive(new SectionsPrimitive(pane.name));
             candlestickSeries.priceScale().applyOptions({
                 scaleMargins: {
-                    top: 0.1, 
-                    bottom: 0.1,
+                    top: 0.05, 
+                    bottom: 0.05,
                 },
             });
             break;
           }
           case SeriesType.Line:
-            const lineSeries = chart.addSeries(LineSeries, { color: "#26a69a", lineWidth: 1 }, index);
+            const lineSeries = chart.addSeries(LineSeries, { 
+              color: "#26a69a", 
+              lineWidth: 1,
+              lastPriceAnimation: 0,
+              pointMarkersVisible: false
+            }, index);
             lineSeries.setData(LineData);
             lineSeries.attachPrimitive(new SectionsPrimitive(pane.name));
             lineSeries.priceScale().applyOptions({
               scaleMargins: {
-                  top: 0.1, 
-                  bottom: 0,
+                  top: 0.15, 
+                  bottom: 0.15,
               },
             });
+            lineSeries.applyOptions({pointMarkersVisible: false, crosshairMarkerVisible: false,})
             break;
             
           case SeriesType.StackedAreaSeries:
@@ -385,7 +385,7 @@ const Chart = forwardRef<ChartHandle, ChartProps>(({
             myCustomSeries.attachPrimitive(new SectionsPrimitive(pane.name));
             myCustomSeries.priceScale().applyOptions({
               scaleMargins: {
-                  top: 0.1, 
+                  top: 0.15, 
                   bottom: 0,
               },
             });
@@ -402,9 +402,45 @@ const Chart = forwardRef<ChartHandle, ChartProps>(({
       borderColor: '#71649C',
     });
 
+    // Use MutationObserver to detect when chart elements are added
+    const observer = new MutationObserver((mutations) => {
+      const rows = document.querySelectorAll(".tv-lightweight-charts tr");
+      if (rows.length > 0) {
+        // Disconnect the observer since we found our elements
+        observer.disconnect();
+        
+        console.log("Found rows:", rows.length); // Debug log
+
+        chart.panes().forEach((e, index) => {
+          const legend = document.createElement('div');
+          legend.style.cssText = `position: absolute; left: 12px; margin-top: 12px; z-index: 100; color: white; font-size: 14px; font-family: sans-serif; line-height: 18px; font-weight: 300;`;
+          e.getHTMLElement().appendChild(legend);
+          
+          const firstRow = document.createElement('div');
+          firstRow.innerHTML = panes[index]?.name || 'Unknown';
+          firstRow.style.color = 'white';
+          legend.appendChild(firstRow);
+        });
+      }
+    });
+		chart.applyOptions({
+			crosshair: {
+				mode: CrosshairMode.Normal,
+      }
+    });
+
+    // Start observing the chart container for changes
+    if (chartContainerRef.current) {
+      observer.observe(chartContainerRef.current, {
+        childList: true,
+        subtree: true
+      });
+    }
+
     // Cleanup
     return () => {
       chart.remove();
+      observer.disconnect();
     };
   }, [groups, points, shuffle, panes]);
   
