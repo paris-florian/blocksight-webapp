@@ -294,7 +294,7 @@ export const Header = () => {
                         <img src={logo} alt="BlockSight Logo" className={styles.logoImage} />
                     </div>
                     <ul className={styles.navLinks}>
-                        <li className={isActive('/') ? styles.active : ''} onClick={() => navigate('/')}>Overview</li>
+                        {/* <li className={isActive('/') ? styles.active : ''} onClick={() => navigate('/feed')}>Overview</li> */}
                         <li className={isActive('/feed') ? styles.active : ''} onClick={() => navigate('/feed')}>Feed</li>
                         <li className={isActive('/superchart') ? styles.active : ''} onClick={() => navigate('/superchart/btc')}>Superchart</li>
                         <li className={isActive('/top-tokens') ? styles.active : ''} onClick={() => navigate('/top-tokens')}>Top Tokens</li>

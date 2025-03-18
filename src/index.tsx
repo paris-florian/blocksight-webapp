@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Page } from './components/Page';
 import TokenViewDashboard from './components/pages/Currency/CurrencyView';
 import EntityView from './components/pages/Entity/EntityView';
@@ -40,10 +40,7 @@ const theme = createTheme({
     MuiTextField: {
       styleOverrides: {
         root: {
-          backgroundColor: "#2A2A2A",
-          borderTopLeftRadius: "4px",
-          borderTopRightRadius: "4px",
-          // borderBottomRightRadius: "4px",
+          borderRadius: "8px",
           '--TextField-brandBorderColor': '#49454F',
           '--TextField-brandBorderHoverColor': '#49454F',
           '--TextField-brandBorderFocusedColor': 'white',
@@ -56,6 +53,9 @@ const theme = createTheme({
           color: "white",
           '& .MuiInputBase-input': {
             color: 'white',
+          },
+          '& .MuiOutlinedInput-root': {
+            borderRadius: "8px",
           },
           '& input:-webkit-autofill': {
             '-webkit-box-shadow': '0 0 0 100px #2A2A2A inset',
@@ -166,7 +166,7 @@ root.render(
   <ThemeProvider theme={theme}>
     <React.StrictMode>
       <Routes>
-        <Route path="/" element={<App />} />  
+        <Route path="/" element={<Navigate to="/feed" />} />  
         <Route path="currencies/:currencyId" element={<Page children={<TokenViewDashboard />} />} />
         <Route path="traders/:entityId" element={<Page children={<EntityView />} />} />
         <Route path="superchart/:currencyId" element={<div style={{height: "100vh"}}><SuperchartTab fullscreen={true} /></div>} />

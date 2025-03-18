@@ -67,41 +67,55 @@ const CurrencyView: React.FC = () => {
     setSearchOpen(false);
   };
 
-  const tabs = [
-    { name: "Dashboard", id: "dashboard", element: <DashboardTab />, }, 
-    { name: "Feed", id: "feed", element: <FeedTab currencySymbol={currentToken.symbol} />, }, 
-    // { name: "Market Participants", id: "market-participants", element: <MarketParticipantsTab/>, }, 
-    { name: "Superchart", id: "superchart", element: <div style={{ height: "28rem"}}><SuperchartTab fullscreen={false}/></div>, }, 
-    // { name: "Entry Analysis", id: "entry-analysis", element: <EntryAnalysisTab/>, }, 
-    { name: "Top Traders", id: "top-traders", element: <TopTradersTab />, }, 
-    { name: "Institutions", id: "institutions", element: <InstitutionsTab/>, }, 
-    { name: "Influencers", id: "influencers", element: <InfluencersTab/>, }, 
-  ];
+  // Define tab IDs for reference
+  const tabIds = {
+    dashboard: "dashboard",
+    feed: "feed",
+    superchart: "superchart",
+    topTraders: "top-traders",
+    institutions: "institutions",
+    influencers: "influencers"
+  };
 
   // Initialize current tab based on URL hash or default to first tab
-  const [currentTab, setTab] = useState(() => {
+  const [currentTabId, setCurrentTabId] = useState(() => {
     const hash = window.location.hash.slice(1); // Remove the # symbol
-    return tabs.find(t => t.id === hash) || tabs[0];
+    return Object.values(tabIds).includes(hash) ? hash : tabIds.dashboard;
   });
 
   // Update URL hash when tab changes
   useEffect(() => {
-    window.location.hash = currentTab.id;
-  }, [currentTab]);
+    window.location.hash = currentTabId;
+  }, [currentTabId]);
 
   // Listen for hash changes and update the current tab
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1);
-      const tab = tabs.find(t => t.id === hash);
-      if (tab) {
-        setTab(tab);
+      if (Object.values(tabIds).includes(hash)) {
+        setCurrentTabId(hash);
       }
     };
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [tabs]);
+  }, []);
+
+  // Define tabs with the current currency symbol
+  const getTabs = () => [
+    { name: "Dashboard", id: tabIds.dashboard, element: <DashboardTab /> }, 
+    { name: "Feed", id: tabIds.feed, element: <FeedTab currencySymbol={currentToken.symbol} /> }, 
+    { name: "Superchart", id: tabIds.superchart, element: <div style={{ height: "28rem"}}><SuperchartTab fullscreen={false}/></div> }, 
+    { name: "Top Traders", id: tabIds.topTraders, element: <TopTradersTab /> }, 
+    { name: "Institutions", id: tabIds.institutions, element: <InstitutionsTab/> }, 
+    { name: "Influencers", id: tabIds.influencers, element: <InfluencersTab/> }, 
+  ];
+
+  // Get the current tabs array with up-to-date components
+  const tabs = getTabs();
+  
+  // Get the current tab based on the ID
+  const currentTab = tabs.find(tab => tab.id === currentTabId) || tabs[0];
 
   return (
     <div className={styles.currencyView}>
@@ -128,7 +142,7 @@ const CurrencyView: React.FC = () => {
       <CustomTabNavigation
         tabs={tabs}
         currentTab={currentTab}
-        onTabChange={setTab}
+        onTabChange={(tab) => setCurrentTabId(tab.id)}
       />
 
       <div style={{marginTop: "1.2rem"}}>

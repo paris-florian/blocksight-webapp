@@ -474,12 +474,15 @@ const FilterModal: React.FC<IFilterProps> = ({ open, onClose, fields, onFilterCh
                             }}
                             sx={{
                               width: '100%',
+                              bgcolor: 'transparent',
+                              borderRadius: '8px',
                               '& .MuiOutlinedInput-root': {
                                 color: 'white',
                                 bgcolor: 'rgba(255, 255, 255, 0.03)',
                                 borderRadius: '8px',
                                 '& fieldset': {
                                   borderColor: 'rgba(255, 255, 255, 0.1)',
+                                  borderRadius: '8px',
                                 },
                                 '&:hover fieldset': {
                                   borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -515,12 +518,15 @@ const FilterModal: React.FC<IFilterProps> = ({ open, onClose, fields, onFilterCh
                             }}
                             sx={{
                               width: '100%',
+                              bgcolor: 'transparent',
+                              borderRadius: '8px',
                               '& .MuiOutlinedInput-root': {
                                 color: 'white',
                                 bgcolor: 'rgba(255, 255, 255, 0.03)',
                                 borderRadius: '8px',
                                 '& fieldset': {
                                   borderColor: 'rgba(255, 255, 255, 0.1)',
+                                  borderRadius: '8px',
                                 },
                                 '&:hover fieldset': {
                                   borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -767,12 +773,15 @@ const FilterModal: React.FC<IFilterProps> = ({ open, onClose, fields, onFilterCh
                   }}
                   sx={{
                     width: '100%',
+                    bgcolor: 'transparent',
+                    borderRadius: '8px',
                     '& .MuiOutlinedInput-root': {
                       color: 'white',
                       bgcolor: 'rgba(255, 255, 255, 0.03)',
                       borderRadius: '8px',
                       '& fieldset': {
                         borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '8px',
                       },
                       '&:hover fieldset': {
                         borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -808,12 +817,15 @@ const FilterModal: React.FC<IFilterProps> = ({ open, onClose, fields, onFilterCh
                   }}
                   sx={{
                     width: '100%',
+                    bgcolor: 'transparent',
+                    borderRadius: '8px',
                     '& .MuiOutlinedInput-root': {
                       color: 'white',
                       bgcolor: 'rgba(255, 255, 255, 0.03)',
                       borderRadius: '8px',
                       '& fieldset': {
                         borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderRadius: '8px',
                       },
                       '&:hover fieldset': {
                         borderColor: 'rgba(255, 255, 255, 0.2)',
