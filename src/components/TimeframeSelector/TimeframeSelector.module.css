@@ -24,6 +24,7 @@ color: #d0d0d0;
 
 .selected {
     color: white;
+    font-weight: 600;
 }
 
 .divider {

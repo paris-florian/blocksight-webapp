@@ -7,14 +7,18 @@ import { DashboardTab } from "./Tabs/DashboardTab";
 import { MarketParticipantsTab } from "./Tabs/MarketParticipantsTab";
 import { SuperchartTab } from "./Tabs/SuperchartTab/SuperchartTab";
 import { EntryAnalysisTab } from "./Tabs/EntryAnalysisTab";
-import { InfluencersTab } from "./Tabs/InfluencersTab";
-import { HighValueTradersTab } from "./Tabs/HighValueTradersTab";
-import { InstitutionsTab } from "./Tabs/InstitutionsTab";
-import { mockTokens } from "../../Sidebar/Sidebar";
+import { InfluencersTab } from "./Tabs/InfluencersTab/InfluencersTab";
+import FeedTab from "./Tabs/FeedTab";
+import { sidebarTokens } from "../../Sidebar/Sidebar";
 import { priceService } from "../../../services/PriceService";
 import TokenSearchPopup from "../../../components/TokenSearchPopup/TokenSearchPopup";
-import { IconButton } from "@mui/material";
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import CustomTabNavigation from "../../shared/CustomTabNavigation";
+import { ViewHeader } from "../../shared/ViewHeader";
+import { tokens } from "../../../data/data";
+import { FollowButton } from "../../shared/FollowButton";
+import { Box } from "@mui/material";
+import { TopTradersTab } from "./Tabs/TopTradersTab/TopTradersTab";
+import { InstitutionsTab } from "./Tabs/InstitutionsTab/InstitutionsTab";
 
 const CurrencyView: React.FC = () => {  
   let { currencyId } = useParams();
@@ -22,10 +26,26 @@ const CurrencyView: React.FC = () => {
   const [currentPrice, setCurrentPrice] = useState<string>('');
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Find the current token
-  const currentToken = mockTokens.find(
-    token => token.symbol.toLowerCase() === currencyId?.toLowerCase()
-  ) || mockTokens[0];
+  // Find the current token by ID, symbol, or contract address
+  const currentToken = sidebarTokens.find(token => {
+    if (!currencyId) return false;
+    
+    const lowerCurrencyId = currencyId.toLowerCase();
+    
+    // Check if currencyId matches symbol
+    if (token.symbol.toLowerCase() === lowerCurrencyId) {
+      return true;
+    }
+    
+    // Find the original token to check contract address
+    const originalToken = tokens.find(t => t.symbol === token.symbol);
+    if (originalToken && originalToken.contractAddress && 
+        originalToken.contractAddress.toLowerCase() === lowerCurrencyId) {
+      return true;
+    }
+    
+    return false;
+  }) || sidebarTokens[0];
 
   // Subscribe to price updates
   useEffect(() => {
@@ -36,21 +56,26 @@ const CurrencyView: React.FC = () => {
     return () => unsubscribe();
   }, [currentToken.symbol]);
 
-  const handleTokenSelect = (token: typeof mockTokens[0]) => {
+  const handleTokenSelect = (token: typeof sidebarTokens[0]) => {
+    // Find the original token to get the ID
+    const originalToken = tokens.find(t => t.symbol === token.symbol);
+    const identifier = originalToken?.id || token.symbol.toLowerCase();
+    
     // Update URL preserving the current hash
     const hash = window.location.hash;
-    navigate(`/currencies/${token.symbol.toLowerCase()}${hash}`);
+    navigate(`/currencies/${identifier}${hash}`);
     setSearchOpen(false);
   };
 
   const tabs = [
     { name: "Dashboard", id: "dashboard", element: <DashboardTab />, }, 
-    { name: "Market Participants", id: "market-participants", element: <MarketParticipantsTab/>, }, 
+    { name: "Feed", id: "feed", element: <FeedTab currencySymbol={currentToken.symbol} />, }, 
+    // { name: "Market Participants", id: "market-participants", element: <MarketParticipantsTab/>, }, 
     { name: "Superchart", id: "superchart", element: <div style={{ height: "28rem"}}><SuperchartTab fullscreen={false}/></div>, }, 
     // { name: "Entry Analysis", id: "entry-analysis", element: <EntryAnalysisTab/>, }, 
-    { name: "Influencers", id: "influencers", element: <InfluencersTab/>, }, 
-    { name: "High-Value Traders", id: "high-value-traders", element: <HighValueTradersTab/>, }, 
+    { name: "Top Traders", id: "top-traders", element: <TopTradersTab />, }, 
     { name: "Institutions", id: "institutions", element: <InstitutionsTab/>, }, 
+    { name: "Influencers", id: "influencers", element: <InfluencersTab/>, }, 
   ];
 
   // Initialize current tab based on URL hash or default to first tab
@@ -79,55 +104,47 @@ const CurrencyView: React.FC = () => {
   }, [tabs]);
 
   return (
-      <div className={styles.mainContent}>
-        <header className={styles.tokenHeader}>
-          <div className={styles.tokenIconContainer}>
-            <img
-              src={currentToken.iconUrl}
-              alt={`${currentToken.name} icon`}
-              className={styles.tokenIcon}
+    <div className={styles.currencyView}>
+      <div className={styles.viewHeader}>
+        <ViewHeader
+          title={`${currentToken.name} ($${currentToken.symbol})`}
+          subtitle={currentPrice}
+          iconUrl={currentToken.iconUrl}
+          onSwap={() => setSearchOpen(true)}
+          showSwapButton={true}
+          rightContent={
+            <FollowButton 
+              id={currentToken.symbol.toLowerCase()}
+              name={currentToken.name}
+              symbol={currentToken.symbol}
+              image={currentToken.iconUrl}
+              type="currency"
+              size="medium"
             />
-            <IconButton 
-              className={styles.swapButton}
-              size="small"
-              aria-label="swap token"
-              onClick={() => setSearchOpen(true)}
-            >
-              <SwapHorizIcon fontSize="small" sx={{fill: "white"}} />
-            </IconButton>
-          </div>
-          <div className={styles.tokenInfo}>
-            <h2 className={styles.tokenName}>${currentToken.symbol}</h2>
-            <p className={styles.tokenPrice}>{currentPrice}</p>
-          </div>
-        </header>
-
-        <nav className={styles.navTabs}>
-          {tabs.map(t => (
-            <button 
-              key={t.id}
-              onClick={() => setTab(t)} 
-              className={`${styles.tab} ${currentTab.id === t.id ? styles.tabactive : ""}`}
-            >
-              {t.name}
-            </button>
-          ))}
-        </nav>
-
-        <div style={{marginTop: "1.2rem"}}>
-          {currentTab.element}
-        </div>
-
-        <TokenSearchPopup
-          open={searchOpen}
-          onClose={() => setSearchOpen(false)}
-          onTokenSelect={handleTokenSelect}
-          tokens={mockTokens.map(token => ({
-            ...token,
-            price: priceService.formatPrice(priceService.getPrice(token.symbol))
-          }))}
+          }
         />
       </div>
+
+      <CustomTabNavigation
+        tabs={tabs}
+        currentTab={currentTab}
+        onTabChange={setTab}
+      />
+
+      <div style={{marginTop: "1.2rem"}}>
+        {currentTab.element}
+      </div>
+
+      <TokenSearchPopup
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onTokenSelect={handleTokenSelect}
+        tokens={sidebarTokens.map(token => ({
+          ...token,
+          price: priceService.formatPrice(priceService.getPrice(token.symbol))
+        }))}
+      />
+    </div>
   );
 };
 

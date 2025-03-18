@@ -1,0 +1,26 @@
+.navTabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid #2d3748;
+  /* padding-bottom: 0.5rem; */
+}
+
+.tab {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding-bottom: 0.75rem;
+  transition: color 0.2s;
+}
+
+.tab:hover {
+  color: #ffffff;
+}
+
+.tabactive {
+  color: #ffffff;
+  border-bottom: 2px solid #3861FB;
+} 

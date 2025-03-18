@@ -1,0 +1,99 @@
+.mainContent {
+  padding: 1.5rem;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.navTabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid #2d3748;
+  padding-bottom: 0.5rem;
+}
+
+.tab {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.tab:hover {
+  color: #ffffff;
+}
+
+.tabactive {
+  color: #ffffff;
+  border-bottom: 2px solid #4299e1;
+}
+
+.entityView {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.entityHeader {
+  margin-bottom: 24px;
+}
+
+.entityInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.entityDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.entityName {
+  margin: 0;
+  color: white;
+  font-weight: 600;
+}
+
+.entityAvatar {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .entityView {
+    padding: 16px;
+  }
+  
+  .entityInfo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .entityAvatar {
+    margin-bottom: 16px;
+    margin-right: 0 !important;
+  }
+  
+  .nameRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .nameRow > div {
+    margin-left: 0 !important;
+    margin-top: 8px;
+  }
+} 

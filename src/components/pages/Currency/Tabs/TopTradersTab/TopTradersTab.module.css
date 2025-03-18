@@ -1,0 +1,58 @@
+.container {
+  margin-top: 2rem;
+}
+
+.tableContainer {
+  background-color: #1E1E1E;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.tableCell {
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+}
+
+.tableHeaderCell {
+  color: #8B8B8B;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+}
+
+.tableHeaderCell.sortable {
+  cursor: pointer;
+}
+
+.tableHeaderCell.sortable:hover {
+  color: white;
+}
+
+.traderInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.starButton {
+  color: #8B8B8B;
+  padding: 4px;
+}
+
+.starButton:hover {
+  color: white;
+}
+
+@media (width <= 991px) {
+  .container {
+    padding: 1rem;
+  }
+}
+
+@media (width <= 640px) {
+  .container {
+    padding: 0.75rem;
+  }
+}

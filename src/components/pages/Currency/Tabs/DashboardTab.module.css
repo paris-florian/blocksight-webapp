@@ -1,0 +1,258 @@
+.styledCard {
+  background-color: #1E1E1E !important;
+  border-radius: 12px;
+  padding: 16px;
+  color: white;
+  box-shadow: none;
+}
+
+.gaugeCard {
+  composes: styledCard;
+  display: flex;
+  flex-direction: column;
+  height: 120px;
+  position: relative;
+  padding: 12px;
+}
+
+.circularProgress {
+  stroke-linecap: round;
+}
+
+.circularProgress[data-value="low"] {
+  color: #FF4B4B;
+}
+
+.circularProgress[data-value="medium"] {
+  color: #FFB937;
+}
+
+.circularProgress[data-value="high"] {
+  color: #1EC490;
+}
+
+.tableCell {
+  color: white;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+}
+
+.tableHeaderCell {
+  composes: tableCell;
+  color: #8B8B8B;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.timelineCard {
+  composes: styledCard;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+.timelineItem {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timelineItem:last-child {
+  border-bottom: none;
+}
+
+.toggleButtonGroup {
+  background-color: #1E1E1E;
+  border-radius: 20px;
+  padding: 2px;
+}
+
+.toggleButton {
+  color: #8B8B8B;
+  border: none;
+  border-radius: 20px;
+  padding: 4px 12px;
+  text-transform: none;
+}
+
+.toggleButton:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.toggleButton[data-selected="true"] {
+  background-color: #fff;
+  color: #000;
+}
+
+.toggleButton[data-selected="true"]:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.tab {
+  text-transform: none;
+  min-width: auto;
+  padding: 6px 16px;
+  border-radius: 20px;
+  color: white;
+}
+
+.tab[data-selected="true"] {
+  background-color: #1E1E1E;
+}
+
+.gaugeContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.gaugeValue {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gaugeValueText {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.gaugeStatus {
+  color: #8B8B8B;
+  margin-top: -4px;
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.metricLabel {
+  color: #8B8B8B;
+}
+
+.chevronIcon {
+  color: #8B8B8B;
+  font-size: 1.25rem;
+}
+
+.metricValue {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.metricValueText {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.positiveChange {
+  color: #1EC490;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.negativeChange {
+  color: #FF4B4B;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.feedHeader {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feedTitle {
+  color: white;
+  font-size: 1rem;
+}
+
+.feedContent {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.newsTime {
+  color: #8B8B8B;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+}
+
+.newsTitle {
+  color: white;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.newsDescription {
+  color: #8B8B8B;
+  margin-bottom: 8px;
+  font-size: 0.875rem;
+}
+
+.newsSource {
+  color: #8B8B8B;
+  font-size: 0.875rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+}
+
+.tabsContainer {
+  min-height: auto;
+}
+
+.tabsFlexContainer {
+  gap: 8px;
+}
+
+.tableContainer {
+  background-color: transparent;
+}
+
+.starButton {
+  color: #8B8B8B;
+  padding: 4px;
+}
+
+.traderInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.traderAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+.changeIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+} 

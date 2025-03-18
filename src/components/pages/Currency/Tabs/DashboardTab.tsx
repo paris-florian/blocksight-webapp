@@ -1,130 +1,111 @@
-import React from 'react';
-import { Box, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tab, Tabs, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Card, Typography, Chip, Grid, IconButton } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
-import { styled } from '@mui/material/styles';
 import CircularProgress from '@mui/material/CircularProgress';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import PersonIcon from '@mui/icons-material/Person';
 import GroupsIcon from '@mui/icons-material/Groups';
+import styles from './DashboardTab.module.css';
+import TabTitle from '../../../../components/shared/TabTitle';
+import CategoryFilter from '../../../../components/shared/CategoryFilter';
+import { COMMON_CATEGORIES } from '../../../../constants/categories';
+import { ColumnDefinition, ColumnDefinitionType, DataTable, IRecord, SortDirection } from "../../../../Table/DataTable";
+import { query, SortConfig } from "../../../../../services/Query.service";
+import { traderRecords } from "../../../../../data/data";
+import { useNavigate } from 'react-router-dom';
 
-// Styled components
-const StyledCard = styled(Card)({
-    backgroundColor: '#141414',
-    borderRadius: '12px',
-    padding: '16px',
-    color: 'white',
-    boxShadow: 'none',
-});
+// Types
+interface Trader {
+  id: number;
+  name: string;
+  type: string;
+  price: number;
+  change1h: number;
+  change24h: number;
+  change7d: number;
+}
 
-const GaugeCard = styled(StyledCard)({
-    display: 'flex',
-    flexDirection: 'column',
-    height: '120px',
-    position: 'relative',
-    padding: '12px',
-});
+interface NewsItem {
+  id: number;
+  title: string;
+  description: string;
+  source: string;
+  timeAgo: string;
+  category: string;
+}
 
-const StyledProgress = styled(CircularProgress)<{ value: number }>(({ value }) => {
-    const getColor = (value: number) => {
-        if (value < 30) return '#FF4B4B';
-        if (value < 70) return '#FFB937';
-        return '#1EC490';
-    };
+interface MetricCardProps {
+  label: string;
+  value: string | number;
+  change?: string;
+}
 
-    return {
-        color: getColor(value),
-        '& .MuiCircularProgress-circle': {
-            strokeLinecap: 'round',
-            strokeWidth: '8',
-        },
-    };
-});
+interface GaugeMetricProps {
+  value: number;
+  label: string;
+  status?: string;
+}
 
-const StyledTableCell = styled(TableCell)({
-    color: 'white',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-    padding: '8px 16px',
-});
-
-const StyledTableHeaderCell = styled(StyledTableCell)({
-    color: '#8B8B8B',
-    fontWeight: 600,
-    fontSize: '0.875rem',
-});
-
-const TimelineCard = styled(StyledCard)({
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    padding: 0,
-});
-
-const TimelineItem = styled(Box)({
-    padding: '16px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-    '&:last-child': {
-        borderBottom: 'none',
-    },
-});
-
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)({
-    backgroundColor: '#1E1E1E',
-    borderRadius: '20px',
-    padding: '2px',
-    '& .MuiToggleButton-root': {
-        color: '#8B8B8B',
-        border: 'none',
-        borderRadius: '20px',
-        padding: '4px 12px',
-        textTransform: 'none',
-        '&.Mui-selected': {
-            backgroundColor: '#fff',
-            color: '#000',
-            '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-            },
-        },
-        '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        },
-    },
-});
-
-const StyledTab = styled(Tab)({
-    textTransform: 'none',
-    minWidth: 'auto',
-    padding: '6px 16px',
-    borderRadius: '20px',
-    color: 'white',
-    '&.Mui-selected': {
-        backgroundColor: '#1E1E1E',
-    },
-});
-
-// Mock data
-const mockTraders = [
-    { id: 1, name: 'XRP Team', type: 'BTC', price: 85940.05, change1h: -0.10, change24h: 2.19, change7d: -10.98 },
-    { id: 2, name: 'Liberty FI', type: 'BTC', price: 85940.05, change1h: -0.10, change24h: 2.19, change7d: -10.98 },
-    { id: 3, name: 'Anonymous Trader', type: 'BTC', price: 85940.05, change1h: -0.10, change24h: 2.19, change7d: -10.98 },
+// Table column definitions for traders
+const fields: ColumnDefinition[] = [
+  { 
+    fieldName: "name", 
+    name: "Name", 
+    sortable: false, 
+    filterable: false, 
+    type: ColumnDefinitionType.NameWithAvatar, 
+    sortIndex: 0,
+    imageFieldName: "image" 
+  },
+  { 
+    fieldName: "average-trade-return-percentage", 
+    name: "Avg. ROI", 
+    filterable: true, 
+    sortable: true, 
+    type: ColumnDefinitionType.Percentage, 
+    group: "ROI", 
+    labelGroup: "Performance", 
+    sortIndex: 1 
+  },
+  { 
+    fieldName: "winrate-total", 
+    name: "Winrate", 
+    filterable: true, 
+    sortable: true, 
+    type: ColumnDefinitionType.Percentage, 
+    group: "Winrate", 
+    labelGroup: "Performance", 
+    sortIndex: 2 
+  },
+  { 
+    fieldName: "drawdown", 
+    name: "Drawdown", 
+    filterable: true, 
+    sortable: true, 
+    type: ColumnDefinitionType.Percentage, 
+    group: "Drawdown", 
+    labelGroup: "Risk", 
+    sortIndex: 3 
+  },
 ];
 
-const mockNews = [
+// Mock data
+const mockNews: NewsItem[] = [
     {
         id: 1,
         title: 'Metaplanet Buys 497 More Bitcoin, Pushing Holdings to Nearly $251M',
         description: 'Japanese investment firm Metaplanet added another 497 Bitcoin to its holdings, spending $43.9 million at an average price of $88,448 per BTC,...',
         source: 'Finance Feeds',
         timeAgo: '50 minutes ago',
+        category: 'All',
     },
-    // Duplicate the same news item multiple times as shown in the screenshot
     {
         id: 2,
         title: 'Metaplanet Buys 497 More Bitcoin, Pushing Holdings to Nearly $251M',
         description: 'Japanese investment firm Metaplanet added another 497 Bitcoin to its holdings, spending $43.9 million at an average price of $88,448 per BTC,...',
         source: 'Finance Feeds',
         timeAgo: '50 minutes ago',
+        category: 'All',
     },
     {
         id: 3,
@@ -132,62 +113,104 @@ const mockNews = [
         description: 'Japanese investment firm Metaplanet added another 497 Bitcoin to its holdings, spending $43.9 million at an average price of $88,448 per BTC,...',
         source: 'Finance Feeds',
         timeAgo: '50 minutes ago',
+        category: 'All',
     },
 ];
 
-const formatPercentage = (value: number, includeSign = true) => {
+const formatPercentage = (value: number, includeSign: boolean = true): string => {
     const sign = includeSign ? (value > 0 ? '+' : '') : '';
     return `${sign}${value.toFixed(2)}%`;
 };
 
-const GaugeMetric = ({ value, label, status = '' }: { value: number; label: string; status?: string }) => (
-    <GaugeCard>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography variant="body2" sx={{ color: '#8B8B8B', fontSize: '0.875rem' }}>
+const getValueCategory = (value: number): 'low' | 'medium' | 'high' => {
+    if (value < 30) return 'low';
+    if (value < 70) return 'medium';
+    return 'high';
+};
+
+// Card styles for different themes
+// Dark theme style for all cards to maintain consistency
+const cardStyle = {
+    bgcolor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: '12px',
+    p: 2,
+    boxShadow: 'none',
+    color: 'white',
+};
+
+// Dark theme style for feed section - matches the main feed component style
+const darkCardStyle = {
+    bgcolor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: '12px',
+    p: 0,
+    boxShadow: 'none',
+    color: 'white',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+};
+
+const metricHeaderStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    mb: 0.5,
+};
+
+const metricLabelStyle = {
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: '0.875rem',
+};
+
+const GaugeMetric: React.FC<GaugeMetricProps> = ({ value, label, status = '' }) => (
+    <Card sx={cardStyle}>
+        <Box sx={metricHeaderStyle}>
+            <Typography variant="body2" sx={metricLabelStyle}>
                 {label}
             </Typography>
-            <ChevronRightIcon sx={{ color: '#8B8B8B', fontSize: '1.25rem' }} />
+            <ChevronRightIcon sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '1.25rem' }} />
         </Box>
         <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-            <StyledProgress
+            <CircularProgress
                 variant="determinate"
                 value={value}
                 size={70}
                 thickness={8}
+                sx={{
+                    color: value < 30 ? '#FF4B4B' : value < 70 ? '#FFB937' : '#1EC490',
+                    '& .MuiCircularProgress-circle': {
+                        strokeLinecap: 'round',
+                    },
+                }}
             />
-            <Box sx={{ 
-                position: 'absolute', 
-                display: 'flex', 
-                flexDirection: 'column',
-                alignItems: 'center' 
-            }}>
-                <Typography sx={{ fontSize: '1.5rem', fontWeight: 500 }}>
+            <Box sx={{ position: 'absolute', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Typography sx={{ fontSize: '1.5rem', fontWeight: 500, color: 'white' }}>
                     {value}
                 </Typography>
                 {status && (
-                    <Typography variant="caption" sx={{ color: '#8B8B8B', mt: -0.5 }}>
+                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.6)', mt: -0.5 }}>
                         {status}
                     </Typography>
                 )}
             </Box>
         </Box>
-    </GaugeCard>
+    </Card>
 );
 
-const MetricCard = ({ label, value, change }: { label: string; value: string; change?: string }) => (
-    <StyledCard sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-            <Typography variant="body2" sx={{ color: '#8B8B8B' }}>
+const MetricCard: React.FC<MetricCardProps> = ({ label, value, change }) => (
+    <Card sx={cardStyle}>
+        <Box sx={metricHeaderStyle}>
+            <Typography variant="body2" sx={metricLabelStyle}>
                 {label}
             </Typography>
-            <ChevronRightIcon sx={{ color: '#8B8B8B', fontSize: '1.25rem' }} />
+            <ChevronRightIcon sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '1.25rem' }} />
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-            <Typography variant="h6" sx={{ fontSize: '1.25rem', fontWeight: 500 }}>{value}</Typography>
+            <Typography sx={{ fontSize: '1.25rem', fontWeight: 500, color: 'white' }}>{value}</Typography>
             {change && (
                 <Typography
                     variant="body2"
-                    sx={{ 
+                    sx={{
                         color: change.startsWith('+') ? '#1EC490' : '#FF4B4B',
                         display: 'flex',
                         alignItems: 'center',
@@ -198,22 +221,42 @@ const MetricCard = ({ label, value, change }: { label: string; value: string; ch
                 </Typography>
             )}
         </Box>
-    </StyledCard>
+    </Card>
 );
 
-export const DashboardTab = () => {
-    const [selectedTab, setSelectedTab] = React.useState(0);
-    const [feedFilter, setFeedFilter] = React.useState('top');
+export const DashboardTab: React.FC = () => {
+    const [selectedTab, setSelectedTab] = useState<number>(0);
+    const [feedFilter, setFeedFilter] = useState<'top' | 'latest'>('top');
+    const [selectedCategory, setSelectedCategory] = useState<string>('All');
+    const [sortField, setSortField] = useState<SortConfig>({ 
+        fieldName: 'winrate-total', 
+        direction: SortDirection.descending 
+    });
+    const navigate = useNavigate();
+
+    // Filter news for Feed section based on selected category
+    const filteredNews = selectedCategory === 'All' 
+      ? mockNews 
+      : mockNews.filter(item => item.category === selectedCategory);
+    
+    const sortedNews = [...filteredNews].slice(0, 5);
+    
+    // Query and sort trader records for the table
+    const filteredAndSortedTraders = query(traderRecords, [], sortField, fields).slice(0, 5);
+    
+    // Handle trader row click
+    const handleRowClick = (recordId: string) => {
+        navigate(`/traders/${recordId}`);
+    };
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ mb: 3, fontWeight: 500 }}>
-                Today's Stats (24H)
-            </Typography>
+        <Box sx={{ py: 3 }}>
+            <TabTitle>Today's Stats (24H)</TabTitle>
             
             <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 3 }}>
+                {/* Left column - Statistics section with dark theme */}
                 <Box>
-                    {/* Stats Grid */}
+                    {/* Stats cards with metric information */}
                     <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, mb: 3 }}>
                         <GaugeMetric value={62} label="Retail Net Volume" status="Good" />
                         <GaugeMetric value={19} label="HWT Fear & Greed" status="Extreme Fear" />
@@ -224,163 +267,122 @@ export const DashboardTab = () => {
                             value="$172.78"
                             change="+2.06%"
                         />
-                        <StyledCard sx={{ p: 2 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
-                                <Typography variant="body2" sx={{ color: '#8B8B8B' }}>
+                        <Card sx={cardStyle}>
+                            <Box sx={metricHeaderStyle}>
+                                <Typography variant="body2" sx={metricLabelStyle}>
                                     Whale/Retail Volume
                                 </Typography>
-                                <ChevronRightIcon sx={{ color: '#8B8B8B', fontSize: '1.25rem' }} />
+                                <ChevronRightIcon sx={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '1.25rem' }} />
                             </Box>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <GroupsIcon sx={{ color: '#3861FB', fontSize: '1rem' }} />
-                                        <Typography variant="body2">Whale</Typography>
+                                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>Whale</Typography>
                                     </Box>
-                                    <Typography variant="body2">30.32%</Typography>
+                                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>30.32%</Typography>
                                 </Box>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <PersonIcon sx={{ color: '#FFB937', fontSize: '1rem' }} />
-                                        <Typography variant="body2">Retail</Typography>
+                                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>Retail</Typography>
                                     </Box>
-                                    <Typography variant="body2">79.68%</Typography>
+                                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>79.68%</Typography>
                                 </Box>
                             </Box>
-                        </StyledCard>
+                        </Card>
                     </Box>
 
-                    {/* Top Traders Section */}
-                    <StyledCard>
-                        <Box sx={{ mb: 2 }}>
-                            <Tabs
-                                value={selectedTab}
-                                onChange={(_, newValue) => setSelectedTab(newValue)}
-                                sx={{
-                                    minHeight: 'auto',
-                                    '& .MuiTabs-flexContainer': {
-                                        gap: 1,
-                                    },
+                    {/* Top Traders Table */}
+                    <Card sx={cardStyle}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                            <Typography variant="h6" sx={{ fontSize: '1rem', color: 'white' }}>
+                                Top Traders
+                            </Typography>
+                            <Typography 
+                                variant="body2" 
+                                sx={{ 
+                                    color: 'rgba(255, 255, 255, 0.6)', 
+                                    cursor: 'pointer',
+                                    '&:hover': { color: 'white' },
+                                    fontSize: '0.875rem'
                                 }}
-                                TabIndicatorProps={{ sx: { display: 'none' } }}
+                                onClick={() => navigate('/traders')}
                             >
-                                <StyledTab label="Biggest Holder" />
-                                <StyledTab label="$TRUMP PNL" />
-                                <StyledTab label="$TRUMP % PNL" />
-                                <StyledTab label="Highest Avg. ROI" />
-                                <StyledTab label="Highest Winrate" />
-                            </Tabs>
+                                View All
+                            </Typography>
                         </Box>
-
-                        <TableContainer sx={{ backgroundColor: 'transparent' }}>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <StyledTableHeaderCell width={40}>#</StyledTableHeaderCell>
-                                        <StyledTableHeaderCell>Name</StyledTableHeaderCell>
-                                        <StyledTableHeaderCell align="right">Price</StyledTableHeaderCell>
-                                        <StyledTableHeaderCell align="right">1h %</StyledTableHeaderCell>
-                                        <StyledTableHeaderCell align="right">24h %</StyledTableHeaderCell>
-                                        <StyledTableHeaderCell align="right">7d %</StyledTableHeaderCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {mockTraders.map((trader) => (
-                                        <TableRow key={trader.id} sx={{ '&:last-child td': { border: 0 } }}>
-                                            <StyledTableCell>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <IconButton size="small" sx={{ color: '#8B8B8B', p: 0.5 }}>
-                                                        <StarBorderIcon fontSize="small" />
-                                                    </IconButton>
-                                                    {trader.id}
-                                                </Box>
-                                            </StyledTableCell>
-                                            <StyledTableCell>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <Box
-                                                        component="img"
-                                                        src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png"
-                                                        sx={{ width: 20, height: 20, borderRadius: '50%' }}
-                                                    />
-                                                    {trader.name}
-                                                </Box>
-                                            </StyledTableCell>
-                                            <StyledTableCell align="right">${trader.price.toLocaleString()}</StyledTableCell>
-                                            <StyledTableCell align="right">
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
-                                                    {trader.change1h >= 0 ? 
-                                                        <ArrowUpwardIcon sx={{ color: '#1EC490', fontSize: '1rem' }} /> :
-                                                        <ArrowDownwardIcon sx={{ color: '#FF4B4B', fontSize: '1rem' }} />
-                                                    }
-                                                    <Typography sx={{ color: trader.change1h >= 0 ? '#1EC490' : '#FF4B4B' }}>
-                                                        {formatPercentage(Math.abs(trader.change1h))}
-                                                    </Typography>
-                                                </Box>
-                                            </StyledTableCell>
-                                            <StyledTableCell align="right">
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
-                                                    {trader.change24h >= 0 ? 
-                                                        <ArrowUpwardIcon sx={{ color: '#1EC490', fontSize: '1rem' }} /> :
-                                                        <ArrowDownwardIcon sx={{ color: '#FF4B4B', fontSize: '1rem' }} />
-                                                    }
-                                                    <Typography sx={{ color: trader.change24h >= 0 ? '#1EC490' : '#FF4B4B' }}>
-                                                        {formatPercentage(Math.abs(trader.change24h))}
-                                                    </Typography>
-                                                </Box>
-                                            </StyledTableCell>
-                                            <StyledTableCell align="right">
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
-                                                    {trader.change7d >= 0 ? 
-                                                        <ArrowUpwardIcon sx={{ color: '#1EC490', fontSize: '1rem' }} /> :
-                                                        <ArrowDownwardIcon sx={{ color: '#FF4B4B', fontSize: '1rem' }} />
-                                                    }
-                                                    <Typography sx={{ color: trader.change7d >= 0 ? '#1EC490' : '#FF4B4B' }}>
-                                                        {formatPercentage(Math.abs(trader.change7d))}
-                                                    </Typography>
-                                                </Box>
-                                            </StyledTableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </StyledCard>
+                        
+                        <DataTable 
+                            handleSort={(name: string, direction: SortDirection) => { setSortField({fieldName: name, direction}) }} 
+                            columnDefinitionsArray={fields} 
+                            records={filteredAndSortedTraders} 
+                            onRowClick={handleRowClick}
+                        />
+                    </Card>
                 </Box>
 
-                {/* News Feed Timeline */}
-                <TimelineCard>
-                    <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                        <Typography variant="h6" sx={{ color: 'white', fontSize: '1rem' }}>Feed</Typography>
-                        <StyledToggleButtonGroup
-                            value={feedFilter}
-                            exclusive
-                            onChange={(_, newValue) => newValue && setFeedFilter(newValue)}
-                            size="small"
-                        >
-                            <ToggleButton value="top">Top</ToggleButton>
-                            <ToggleButton value="latest">Latest</ToggleButton>
-                        </StyledToggleButtonGroup>
+                {/* Right column - Feed section with dark theme to match main feed */}
+                <Card sx={darkCardStyle}>
+                    {/* Feed header */}
+                    <Box sx={{ 
+                        p: 2, 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center', 
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                        <Typography variant="h6" sx={{ fontSize: '1rem', color: 'white' }}>Feed</Typography>
                     </Box>
+
+                    {/* Feed filter controls */}
+                    <Box sx={{ p: 2 }}>
+                        <CategoryFilter 
+                            categories={COMMON_CATEGORIES}
+                            selectedCategory={selectedCategory}
+                            onCategoryChange={setSelectedCategory}
+                            feedFilter={feedFilter}
+                            onFeedFilterChange={setFeedFilter}
+                            darkMode={true} // Use dark mode to match feed styling
+                            sx={{ mb: 1 }}
+                        />
+                    </Box>
+
+                    {/* Feed items list */}
                     <Box sx={{ overflowY: 'auto', flex: 1 }}>
-                        {mockNews.map((item) => (
-                            <TimelineItem key={item.id}>
-                                <Typography variant="body2" sx={{ color: '#8B8B8B', mb: 1, fontSize: '0.875rem' }}>
+                        {sortedNews.map((item) => (
+                            <Box 
+                                key={item.id} 
+                                sx={{ 
+                                    p: 2, 
+                                    borderBottom: '1px solid rgba(255, 255, 255, 0.1)', 
+                                    '&:last-child': { borderBottom: 'none' },
+                                    '&:hover': {
+                                        bgcolor: 'rgba(255, 255, 255, 0.1)',
+                                        cursor: 'pointer'
+                                    },
+                                    transition: 'background-color 0.2s'
+                                }}
+                            >
+                                <Typography sx={{ color: 'rgba(255, 255, 255, 0.6)', mb: 1, fontSize: '0.875rem' }}>
                                     {item.timeAgo}
                                 </Typography>
-                                <Typography variant="subtitle1" sx={{ color: 'white', mb: 1, fontWeight: 500, fontSize: '0.9375rem' }}>
+                                <Typography sx={{ mb: 1, fontWeight: 500, fontSize: '0.9375rem', color: 'white' }}>
                                     {item.title}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#8B8B8B', mb: 1, fontSize: '0.875rem' }}>
+                                <Typography sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 1, fontSize: '0.875rem' }}>
                                     {item.description}
                                 </Typography>
-                                <Typography variant="body2" sx={{ color: '#8B8B8B', fontSize: '0.875rem' }}>
+                                <Typography sx={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.875rem' }}>
                                     {item.source}
                                 </Typography>
-                            </TimelineItem>
+                            </Box>
                         ))}
                     </Box>
-                </TimelineCard>
+                </Card>
             </Box>
         </Box>
     );
 };
+
+export default DashboardTab;

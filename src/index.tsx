@@ -3,14 +3,19 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Page } from './components/Page';
 import TokenViewDashboard from './components/pages/Currency/CurrencyView';
+import EntityView from './components/pages/Entity/EntityView';
+import TopTradersView from './components/pages/TopTraders/TopTradersView';
 import { ThemeProvider } from '@emotion/react';
 import { createMuiTheme, createTheme, darkScrollbar } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
 import { SuperchartTab } from './components/pages/Currency/Tabs/SuperchartTab/SuperchartTab';
+import TopTokensView from './components/pages/TopTokens/TopTokensView';
+import FeedView from './components/pages/Feed/FeedView';
+import ArticleView from './components/pages/Article/ArticleView';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -163,7 +168,12 @@ root.render(
       <Routes>
         <Route path="/" element={<App />} />  
         <Route path="currencies/:currencyId" element={<Page children={<TokenViewDashboard />} />} />
+        <Route path="traders/:entityId" element={<Page children={<EntityView />} />} />
         <Route path="superchart/:currencyId" element={<div style={{height: "100vh"}}><SuperchartTab fullscreen={true} /></div>} />
+        <Route path="top-traders" element={<Page children={<TopTradersView />} />} />
+        <Route path="top-tokens" element={<Page children={<TopTokensView />} />} />
+        <Route path="feed" element={<Page children={<FeedView />} />} />
+        <Route path="articles/:slug" element={<Page children={<ArticleView />} />} />
       </Routes>
     </React.StrictMode>
     </ThemeProvider>

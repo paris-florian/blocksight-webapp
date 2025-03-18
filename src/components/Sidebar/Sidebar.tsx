@@ -10,6 +10,7 @@ import { useNavigate, useParams } from 'react-router';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import TokenSearchPopup from '../TokenSearchPopup/TokenSearchPopup';
 import { priceService } from '../../services/PriceService';
+import { tokens } from '../../data/data';
 
 export interface Token {
     symbol: string;
@@ -18,13 +19,12 @@ export interface Token {
     price?: string;
 }
 
-// Add this mock data (you can replace it with your actual token list)
-export const mockTokens: Token[] = [
-    { symbol: 'TRUMP', name: 'Trump Token', iconUrl: '/assets/trump-token.png' },
-    { symbol: 'BTC', name: 'Bitcoin', iconUrl: 'https://assets.coingecko.com/coins/images/1/small/bitcoin.png' },
-    { symbol: 'ETH', name: 'Ethereum', iconUrl: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png' },
-    // Add more tokens as needed
-];
+// Convert the tokens from data.ts to the format expected by this component
+export const sidebarTokens: Token[] = tokens.map(token => ({
+    symbol: token.symbol,
+    name: token.name,
+    iconUrl: token.image
+}));
 
 interface MenuItem {
   type: 'toggle' | 'dropdown';
@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
 
     const [openFolders, setOpenFolders] = useState<Set<string>>(new Set());
     const [searchOpen, setSearchOpen] = useState(false);
-    const [selectedToken, setSelectedToken] = useState<Token>(props.initialToken || mockTokens[0]);
+    const [selectedToken, setSelectedToken] = useState<Token>(props.initialToken || sidebarTokens[0]);
     const [currentPrice, setCurrentPrice] = useState<string>(
         priceService.formatPrice(priceService.getPrice(selectedToken.symbol))
     );
@@ -194,11 +194,16 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
     const handleTokenSelect = (token: Token) => {
         setSelectedToken(token);
         setCurrentPrice(priceService.formatPrice(priceService.getPrice(token.symbol)));
+        
+        // Find the original token to get the ID
+        const originalToken = tokens.find(t => t.symbol === token.symbol);
+        const identifier = originalToken?.id || token.symbol.toLowerCase();
+        
         // Update URL based on current view
         if (props.fullscreen) {
-            navigate(`/superchart/${token.symbol.toLowerCase()}`);
+            navigate(`/superchart/${identifier}`);
         } else {
-            navigate(`/currencies/${token.symbol.toLowerCase()}#superchart`);
+            navigate(`/currencies/${identifier}#superchart`);
         }
     };
 
@@ -243,7 +248,7 @@ export const Sidebar: React.FC<SidebarProps> = (props) => {
                         open={searchOpen}
                         onClose={() => setSearchOpen(false)}
                         onTokenSelect={handleTokenSelect}
-                        tokens={mockTokens.map(token => ({
+                        tokens={sidebarTokens.map(token => ({
                             ...token,
                             price: priceService.formatPrice(priceService.getPrice(token.symbol))
                         }))}

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import styles from './SuperchartTab.module.css';
 import Sidebar from "../../../../Sidebar/Sidebar";
-import { mockTokens } from "../../../../Sidebar/Sidebar";
+import { sidebarTokens } from "../../../../Sidebar/Sidebar";
 import Chart, { ChartHandle, SeriesType } from "../../../../Chart/Chart";
 import TimeframeSelector, { Timeframe } from "../../../../TimeframeSelector/TimeframeSelector";
 import { DatasetSettings } from "./DatasetSettings";
@@ -12,7 +12,7 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import { Fullscreen } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
-import { e } from "react-router/dist/development/route-data-BmvbmBej";
+import { tokens } from "../../../../../data/data";
 
 export type SidebarElement = FolderSidebarElement | DatasetSidebarElement;
 
@@ -240,10 +240,26 @@ export const SuperchartTab = (props: {fullscreen: boolean}) => {
     const chartRef = useRef<ChartHandle>(null);
     let navigate = useNavigate();
 
-    // Find the current token from the URL parameter
-    const currentToken = mockTokens.find(
-        token => token.symbol.toLowerCase() === currencyId?.toLowerCase()
-    ) || mockTokens[0];
+    // Find the current token from the URL parameter by ID, symbol, or contract address
+    const currentToken = sidebarTokens.find(token => {
+        if (!currencyId) return false;
+        
+        const lowerCurrencyId = currencyId.toLowerCase();
+        
+        // Check if currencyId matches symbol
+        if (token.symbol.toLowerCase() === lowerCurrencyId) {
+            return true;
+        }
+        
+        // Find the original token to check contract address
+        const originalToken = tokens.find(t => t.symbol === token.symbol);
+        if (originalToken && originalToken.contractAddress && 
+            originalToken.contractAddress.toLowerCase() === lowerCurrencyId) {
+            return true;
+        }
+        
+        return false;
+    }) || sidebarTokens[0];
 
     return (
         <div className={styles.container} style={props.fullscreen ? {} : {borderRadius: "12px", overflow: "hidden"}}>
@@ -271,21 +287,32 @@ export const SuperchartTab = (props: {fullscreen: boolean}) => {
                             ]} 
                         />
                         {!props.fullscreen && (
-                            
-                <IconButton onClick={e => { e.stopPropagation(); navigate("/superchart/"+currencyId) }} className={styles.settingsButton} aria-label="edit">
-                    <FullscreenIcon  sx={{fill: "#D3D3D3"}} />
-                </IconButton>)}
-                        {/* <MagnetToggle setMagnetState={t => { chartRef.current?.applyOptions({crosshair: { mode: t ? CrosshairMode.Magnet : CrosshairMode.Normal}}) }} default={true} /> */}
+                            <IconButton 
+                                sx={{padding: 0, marginLeft: "0.35rem"}} 
+                                onClick={e => { 
+                                    e.stopPropagation(); 
+                                    // Find the original token to get the ID
+                                    const originalToken = tokens.find(t => t.symbol === currentToken.symbol);
+                                    const identifier = originalToken?.id || currentToken.symbol.toLowerCase();
+                                    navigate("/superchart/" + identifier);
+                                }} 
+                                className={styles.settingsButton} 
+                                aria-label="edit"
+                            >
+                                <FullscreenIcon sx={{fill: "#D3D3D3"}} />
+                            </IconButton>
+                        )}
                     </ChartTopSelector>
                 </div>
-                <Chart 
-                    ref={chartRef}
-                    // onChart={c => setChart(c)}
-                    panes={selected.map(element => ({
-                        name: element.name,
-                        series: element.series
-                    }))}
-                />
+                <div className={styles.chartContent}>
+                    <Chart
+                        ref={chartRef}
+                        panes={selected.map(element => ({
+                            name: element.name,
+                            series: element.series
+                        }))}
+                    />
+                </div>
             </div>
             {settings && (
                 <DatasetSettings 

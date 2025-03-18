@@ -132,3 +132,95 @@
     grid-template-columns: 1fr;
   }
 }
+
+.currencyView {
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewHeader {
+  margin-bottom: 24px;
+}
+
+.currencyInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.currencyLogo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.currencyDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.currencyName {
+  margin: 0;
+  margin-right: 8px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.currencySymbol {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-right: 8px;
+}
+
+.priceRow {
+  display: flex;
+  align-items: center;
+}
+
+.currentPrice {
+  font-size: 22px;
+  font-weight: 500;
+  margin-right: 12px;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .currencyView {
+    padding: 16px;
+  }
+  
+  .currencyInfo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .currencyLogo {
+    margin-bottom: 16px;
+    margin-right: 0;
+  }
+  
+  .nameRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .nameRow > div {
+    margin-left: 0 !important;
+    margin-top: 8px;
+  }
+}

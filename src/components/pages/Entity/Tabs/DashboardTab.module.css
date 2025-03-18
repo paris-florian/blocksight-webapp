@@ -1,0 +1,79 @@
+.dashboardContainer {
+  padding: 1.5rem;
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.metricCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: none;
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.metricLabel {
+  color: #718096;
+  font-size: 0.875rem;
+}
+
+.metricValue {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.metricChange {
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.metricChange.positive {
+  color: #1EC490;
+}
+
+.metricChange.negative {
+  color: #FF4B4B;
+}
+
+.tableContainer {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: none;
+}
+
+.tableHeader {
+  color: #718096;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.tableCell {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.traderInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.traderIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+} 

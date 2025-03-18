@@ -1,0 +1,80 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.mainContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rightContent {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-left: 16px;
+}
+
+.iconContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.icon {
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.swapButton {
+  position: absolute !important;
+  top: -8px !important;
+  right: -8px !important;
+  background-color: #000000 !important;
+  padding: 4px !important;
+}
+
+.swapButton:hover {
+  background-color: #1a1a1a !important;
+}
+
+.info {
+  flex-direction: column;
+  gap: 4px;
+  display: flex;
+}
+
+.title {
+  color: #fff;
+  font-family: IBM Plex Mono, monospace;
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.subtitle {
+  color: #fff;
+  font-family: IBM Plex Mono, monospace;
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .rightContent {
+    margin-left: 0;
+    margin-top: 16px;
+  }
+} 
