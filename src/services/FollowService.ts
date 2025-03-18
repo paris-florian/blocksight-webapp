@@ -90,9 +90,9 @@ export const isNotificationRelevant = (
 ): boolean => {
     const follows = getFollowedEntities();
     
-    // If user doesn't follow anything, show all notifications
+    // If user doesn't follow anything, don't show any notifications
     if (follows.length === 0) {
-        return true;
+        return false;
     }
     
     const followedCurrencies = follows

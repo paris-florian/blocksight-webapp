@@ -457,9 +457,7 @@ export const Header = () => {
                                 {filteredNotifications.length === 0 ? (
                                     <Box sx={{ p: 3, textAlign: 'center' }}>
                                         <Typography sx={{ color: '#6e6e6e', fontSize: '14px' }}>
-                                            {notifications.length === 0 ? 
-                                                'No notifications' : 
-                                                'You are not following any entities or currencies. Follow them to receive relevant updates.'}
+                                            Follow entities or currencies in order to receive alerts about them.
                                         </Typography>
                                     </Box>
                                 ) : (

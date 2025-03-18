@@ -336,7 +336,7 @@ export const DashboardTab: React.FC = () => {
                     </Box>
 
                     {/* Feed filter controls */}
-                    <Box sx={{ p: 2 }}>
+                    <Box sx={{ pl: 2, pr: 0, py: 2 }}>
                         <CategoryFilter 
                             categories={COMMON_CATEGORIES}
                             selectedCategory={selectedCategory}
@@ -344,7 +344,13 @@ export const DashboardTab: React.FC = () => {
                             feedFilter={feedFilter}
                             onFeedFilterChange={setFeedFilter}
                             darkMode={true} // Use dark mode to match feed styling
-                            sx={{ mb: 1 }}
+                            sx={{ 
+                                mb: 1,
+                                '& > div:first-of-type': {
+                                    pr: 2, // Add right padding to the scrollable container of categories
+                                }
+                            }}
+                            showFeedFilter={false}
                         />
                     </Box>
 
