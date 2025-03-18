@@ -459,7 +459,7 @@ export const Header = () => {
                                         <Typography sx={{ color: '#6e6e6e', fontSize: '14px' }}>
                                             {notifications.length === 0 ? 
                                                 'No notifications' : 
-                                                'No notifications for followed entities. Follow more to see relevant updates.'}
+                                                'You are not following any entities or currencies. Follow them to receive relevant updates.'}
                                         </Typography>
                                     </Box>
                                 ) : (
