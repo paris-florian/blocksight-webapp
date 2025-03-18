@@ -9,10 +9,10 @@ import styles from './DashboardTab.module.css';
 import TabTitle from '../../../../components/shared/TabTitle';
 import CategoryFilter from '../../../../components/shared/CategoryFilter';
 import { COMMON_CATEGORIES } from '../../../../constants/categories';
-import { ColumnDefinition, ColumnDefinitionType, DataTable, IRecord, SortDirection } from "../../../../Table/DataTable";
-import { query, SortConfig } from "../../../../../services/Query.service";
-import { traderRecords } from "../../../../../data/data";
 import { useNavigate } from 'react-router-dom';
+import { traderRecords } from '../../../../data/data';
+import { SortConfig, query } from '../../../../services/Query.service';
+import { ColumnDefinition, ColumnDefinitionType, DataTable, SortDirection } from '../../../Table/DataTable';
 
 // Types
 interface Trader {
